@@ -52,8 +52,6 @@ import org.springframework.data.couchbase.util.IgnoreWhen;
 import com.couchbase.client.java.kv.PersistTo;
 import com.couchbase.client.java.kv.ReplicateTo;
 
-;
-
 /**
  * KV tests Theses tests rely on a cb server running.
  *
@@ -141,6 +139,44 @@ class CouchbaseTemplateKeyValueIntegrationTests extends ClusterAwareIntegrationT
 			assertEquals(user, modified);
 			sleepSecs(6);
 			User found = couchbaseTemplate.findById(User.class).one(user.getId());
+			assertNull(found, "found should have been null as document should be expired");
+		} finally {
+			try {
+				couchbaseTemplate.removeById().one(user.getId());
+			} catch (DataRetrievalFailureException e) {
+				//
+			}
+		}
+	}
+
+	@Test
+	void replaceWithExpiry() {
+		User user = new User(UUID.randomUUID().toString(), "firstname", "lastname");
+		try {
+			User modified = couchbaseTemplate.upsertById(User.class).withExpiry(Duration.ofSeconds(1)).one(user);
+			couchbaseTemplate.replaceById(User.class).withExpiry(Duration.ofSeconds(1)).one(user);
+			assertEquals(user, modified);
+			sleepSecs(2);
+			User found = couchbaseTemplate.findById(User.class).one(user.getId());
+			assertNull(found, "found should have been null as document should be expired");
+		} finally {
+			try {
+				couchbaseTemplate.removeById().one(user.getId());
+			} catch (DataRetrievalFailureException e) {
+				//
+			}
+		}
+	}
+
+	@Test
+	void replaceWithExpiryAnnotation() {
+		UserAnnotated user = new UserAnnotated(UUID.randomUUID().toString(), "firstname", "lastname");
+		try {
+			UserAnnotated modified = couchbaseTemplate.upsertById(UserAnnotated.class).one(user);
+			modified = couchbaseTemplate.replaceById(UserAnnotated.class).one(user);
+			assertEquals(user, modified);
+			sleepSecs(6);
+			User found = couchbaseTemplate.findById(UserAnnotated.class).one(user.getId());
 			assertNull(found, "found should have been null as document should be expired");
 		} finally {
 			try {

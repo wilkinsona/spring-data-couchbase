@@ -198,9 +198,14 @@ public class CouchbaseRepositoryQueryCollectionIntegrationTests extends Collecti
 		// collection from CrudMethodMetadata of UserCol.save()
 		UserCol userCol = new UserCol("1", "Dave", "Wilson");
 		Airport airport = new Airport("3", "myIata", "myIcao");
-		UserCol savedCol = userColRepository.save(userCol); // uses UserCol annotation scope, populates CrudMethodMetadata
-		userColRepository.delete(userCol); // uses UserCol annotation scope, populates CrudMethodMetadata
-		assertThrows(IllegalStateException.class, () -> airportRepository.save(airport));
+		try {
+			UserCol savedCol = userColRepository.save(userCol); // uses UserCol annotation scope, populates CrudMethodMetadata
+			userColRepository.delete(userCol); // uses UserCol annotation scope, populates CrudMethodMetadata
+			assertThrows(IllegalStateException.class, () -> airportRepository.save(airport));
+		} finally {
+			couchbaseTemplate.removeByQuery(Airport.class).all();
+			couchbaseTemplate.findByQuery(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS).all();
+		}
 	}
 
 	// template default scope is my_scope

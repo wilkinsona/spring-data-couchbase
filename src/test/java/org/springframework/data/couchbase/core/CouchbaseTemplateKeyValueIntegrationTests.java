@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -289,7 +288,7 @@ class CouchbaseTemplateKeyValueIntegrationTests extends JavaIntegrationTests {
 			User found = couchbaseTemplate.findById(user.getClass()).one(user.getId());
 			if (user.getId().endsWith(UserAnnotated3.class.getSimpleName())) {
 				if (found == null) {
-					errorList.add("\nfound should be non null as it was set to have no expiry " + user.getId() );
+					errorList.add("\nfound should be non null as it was set to have no expiry " + user.getId());
 				}
 			} else {
 				if (found != null) {

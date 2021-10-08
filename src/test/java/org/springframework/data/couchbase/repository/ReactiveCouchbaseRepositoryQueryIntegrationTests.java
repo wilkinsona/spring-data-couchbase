@@ -214,7 +214,7 @@ public class ReactiveCouchbaseRepositoryQueryIntegrationTests extends JavaIntegr
 	void deleteAllById() {
 
 		Airport vienna = new Airport("airports::vie", "vie", "LOWW");
-		Airport frankfurt = new Airport("airports::fra", "fra", "EDDF");
+		Airport frankfurt = new Airport("airports::fra", "fra", "EDDX");
 		Airport losAngeles = new Airport("airports::lax", "lax", "KLAX");
 
 		try {
@@ -234,7 +234,7 @@ public class ReactiveCouchbaseRepositoryQueryIntegrationTests extends JavaIntegr
 	void deleteAll() {
 
 		Airport vienna = new Airport("airports::vie", "vie", "LOWW");
-		Airport frankfurt = new Airport("airports::fra", "fra", "EDDF");
+		Airport frankfurt = new Airport("airports::fra", "fra", "EDDY");
 		Airport losAngeles = new Airport("airports::lax", "lax", "KLAX");
 
 		try {

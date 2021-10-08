@@ -16,6 +16,7 @@
 
 package org.springframework.data.couchbase.core.query;
 
+import static com.couchbase.client.java.query.QueryScanConsistency.REQUEST_PLUS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -64,7 +65,6 @@ import com.couchbase.client.java.kv.RemoveOptions;
 import com.couchbase.client.java.kv.ReplaceOptions;
 import com.couchbase.client.java.kv.UpsertOptions;
 import com.couchbase.client.java.query.QueryOptions;
-import com.couchbase.client.java.query.QueryScanConsistency;
 
 /**
  * Query tests Theses tests rely on a cb server running This class tests collection support with
@@ -102,14 +102,13 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 		super.beforeEach();
 		// then do processing for this class
 		couchbaseTemplate.removeByQuery(User.class).inCollection(collectionName).all();
-		couchbaseTemplate.findByQuery(User.class).withConsistency(QueryScanConsistency.REQUEST_PLUS)
-				.inCollection(collectionName).all();
+		couchbaseTemplate.findByQuery(User.class).inCollection(collectionName).withConsistency(REQUEST_PLUS).all();
 		couchbaseTemplate.removeByQuery(Airport.class).inScope(scopeName).inCollection(collectionName).all();
-		couchbaseTemplate.findByQuery(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS).inScope(scopeName)
-				.inCollection(collectionName).all();
+		couchbaseTemplate.findByQuery(Airport.class).inScope(scopeName).inCollection(collectionName)
+				.withConsistency(REQUEST_PLUS).all();
 		couchbaseTemplate.removeByQuery(Airport.class).inScope(otherScope).inCollection(otherCollection).all();
-		couchbaseTemplate.findByQuery(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS).inScope(otherScope)
-				.inCollection(otherCollection).all();
+		couchbaseTemplate.findByQuery(Airport.class).inScope(otherScope).inCollection(otherCollection)
+				.withConsistency(REQUEST_PLUS).all();
 	}
 
 	@AfterEach
@@ -118,8 +117,7 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 		// first do processing for this class
 		couchbaseTemplate.removeByQuery(User.class).inCollection(collectionName).all();
 		// query with REQUEST_PLUS to ensure that the remove has completed.
-		couchbaseTemplate.findByQuery(User.class).withConsistency(QueryScanConsistency.REQUEST_PLUS)
-				.inCollection(collectionName).all();
+		couchbaseTemplate.findByQuery(User.class).inCollection(collectionName).withConsistency(REQUEST_PLUS).all();
 		// then call the super method
 		super.afterEach();
 	}
@@ -132,8 +130,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 
 			couchbaseTemplate.upsertById(User.class).inCollection(collectionName).all(Arrays.asList(user1, user2));
 
-			final List<User> foundUsers = couchbaseTemplate.findByQuery(User.class)
-					.withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).all();
+			final List<User> foundUsers = couchbaseTemplate.findByQuery(User.class).inCollection(collectionName)
+					.withConsistency(REQUEST_PLUS).all();
 
 			for (User u : foundUsers) {
 				if (!(u.equals(user1) || u.equals(user2))) {
@@ -175,8 +173,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 		couchbaseTemplate.upsertById(User.class).inCollection(collectionName).all(Arrays.asList(user1, user2, specialUser));
 
 		Query specialUsers = new Query(QueryCriteria.where("firstname").like("special"));
-		final List<User> foundUsers = couchbaseTemplate.findByQuery(User.class)
-				.withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).matching(specialUsers).all();
+		final List<User> foundUsers = couchbaseTemplate.findByQuery(User.class).inCollection(collectionName)
+				.matching(specialUsers).withConsistency(REQUEST_PLUS).all();
 
 		assertEquals(1, foundUsers.size());
 	}
@@ -200,8 +198,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 		Query daveUsers = new Query(QueryCriteria.where("username").like("dave"));
 
 		final List<UserSubmissionProjected> foundUserSubmissions = couchbaseTemplate.findByQuery(UserSubmission.class)
-				.as(UserSubmissionProjected.class).withConsistency(QueryScanConsistency.REQUEST_PLUS)
-				.inCollection(collectionName).matching(daveUsers).all();
+				.inCollection(collectionName).as(UserSubmissionProjected.class).matching(daveUsers)
+				.withConsistency(REQUEST_PLUS).all();
 		assertEquals(1, foundUserSubmissions.size());
 		assertEquals(user.getUsername(), foundUserSubmissions.get(0).getUsername());
 		assertEquals(user.getId(), foundUserSubmissions.get(0).getId());
@@ -217,13 +215,13 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 		couchbaseTemplate.upsertById(User.class).inCollection(collectionName).all(Arrays.asList(user1, user2, specialUser));
 
 		Query specialUsers = new Query(QueryCriteria.where("firstname").like("special"));
-		final List<UserJustLastName> foundUsers = couchbaseTemplate.findByQuery(User.class).as(UserJustLastName.class)
-				.withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).matching(specialUsers).all();
+		final List<UserJustLastName> foundUsers = couchbaseTemplate.findByQuery(User.class).inCollection(collectionName)
+				.as(UserJustLastName.class).matching(specialUsers).withConsistency(REQUEST_PLUS).all();
 		assertEquals(1, foundUsers.size());
 
 		final List<UserJustLastName> foundUsersReactive = reactiveCouchbaseTemplate.findByQuery(User.class)
-				.as(UserJustLastName.class).withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName)
-				.matching(specialUsers).all().collectList().block();
+				.inCollection(collectionName).as(UserJustLastName.class).matching(specialUsers).withConsistency(REQUEST_PLUS)
+				.all().collectList().block();
 		assertEquals(1, foundUsersReactive.size());
 
 	}
@@ -239,8 +237,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 		assertTrue(couchbaseTemplate.existsById().inScope(scopeName).inCollection(collectionName).one(user1.getId()));
 		assertTrue(couchbaseTemplate.existsById().inScope(scopeName).inCollection(collectionName).one(user2.getId()));
 
-		List<RemoveResult> result = couchbaseTemplate.removeByQuery(User.class)
-				.withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).all();
+		List<RemoveResult> result = couchbaseTemplate.removeByQuery(User.class).inCollection(collectionName)
+				.withConsistency(REQUEST_PLUS).all();
 		assertEquals(2, result.size(), "should have deleted user1 and user2");
 
 		assertNull(
@@ -264,8 +262,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 
 		Query nonSpecialUsers = new Query(QueryCriteria.where("firstname").notLike("special"));
 
-		couchbaseTemplate.removeByQuery(User.class).withConsistency(QueryScanConsistency.REQUEST_PLUS)
-				.inCollection(collectionName).matching(nonSpecialUsers).all();
+		couchbaseTemplate.removeByQuery(User.class).inCollection(collectionName).matching(nonSpecialUsers)
+				.withConsistency(REQUEST_PLUS).all();
 
 		assertNull(couchbaseTemplate.findById(User.class).inCollection(collectionName).one(user1.getId()));
 		assertNull(couchbaseTemplate.findById(User.class).inCollection(collectionName).one(user2.getId()));
@@ -288,18 +286,18 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 			// as the fluent api for Distinct is tricky
 
 			// distinct icao
-			List<Airport> airports1 = couchbaseTemplate.findByQuery(Airport.class).distinct(new String[] { "icao" })
-					.as(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).all();
+			List<Airport> airports1 = couchbaseTemplate.findByQuery(Airport.class).inCollection(collectionName)
+					.distinct(new String[] { "icao" }).as(Airport.class).withConsistency(REQUEST_PLUS).all();
 			assertEquals(2, airports1.size());
 
 			// distinct all-fields-in-Airport.class
-			List<Airport> airports2 = couchbaseTemplate.findByQuery(Airport.class).distinct(new String[] {}).as(Airport.class)
-					.withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).all();
+			List<Airport> airports2 = couchbaseTemplate.findByQuery(Airport.class).inCollection(collectionName)
+					.distinct(new String[] {}).as(Airport.class).withConsistency(REQUEST_PLUS).all();
 			assertEquals(7, airports2.size());
 
 			// count( distinct { iata, icao } )
-			long count1 = couchbaseTemplate.findByQuery(Airport.class).distinct(new String[] { "iata", "icao" })
-					.as(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).count();
+			long count1 = couchbaseTemplate.findByQuery(Airport.class).inCollection(collectionName)
+					.distinct(new String[] { "iata", "icao" }).as(Airport.class).withConsistency(REQUEST_PLUS).count();
 			assertEquals(7, count1);
 
 			// count( distinct (all fields in icaoClass)
@@ -307,8 +305,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 				String iata;
 				String icao;
 			}).getClass();
-			long count2 = couchbaseTemplate.findByQuery(Airport.class).distinct(new String[] {}).as(icaoClass)
-					.withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).count();
+			long count2 = couchbaseTemplate.findByQuery(Airport.class).inCollection(collectionName).distinct(new String[] {})
+					.as(icaoClass).withConsistency(REQUEST_PLUS).count();
 			assertEquals(7, count2);
 
 		} finally {
@@ -332,22 +330,20 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 			// as the fluent api for Distinct is tricky
 
 			// distinct icao
-			List<Airport> airports1 = reactiveCouchbaseTemplate.findByQuery(Airport.class).distinct(new String[] { "icao" })
-					.as(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).all()
-					.collectList().block();
+			List<Airport> airports1 = reactiveCouchbaseTemplate.findByQuery(Airport.class).inCollection(collectionName)
+					.distinct(new String[] { "icao" }).as(Airport.class).withConsistency(REQUEST_PLUS).all().collectList()
+					.block();
 			assertEquals(2, airports1.size());
 
 			// distinct all-fields-in-Airport.class
-			List<Airport> airports2 = reactiveCouchbaseTemplate.findByQuery(Airport.class).distinct(new String[] {})
-					.as(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).all()
-					.collectList().block();
+			List<Airport> airports2 = reactiveCouchbaseTemplate.findByQuery(Airport.class).inCollection(collectionName)
+					.distinct(new String[] {}).as(Airport.class).withConsistency(REQUEST_PLUS).all().collectList().block();
 			assertEquals(7, airports2.size());
 
 			// count( distinct icao )
 			// not currently possible to have multiple fields in COUNT(DISTINCT field1, field2, ... ) due to MB43475
-			Long count1 = reactiveCouchbaseTemplate.findByQuery(Airport.class).distinct(new String[] { "icao" })
-					.as(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).count()
-					.block();
+			Long count1 = reactiveCouchbaseTemplate.findByQuery(Airport.class).inCollection(collectionName)
+					.distinct(new String[] { "icao" }).as(Airport.class).withConsistency(REQUEST_PLUS).count().block();
 			assertEquals(2, count1);
 
 			// count( distinct (all fields in icaoClass) // which only has one field
@@ -355,8 +351,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 			Class icaoClass = (new Object() {
 				String icao;
 			}).getClass();
-			long count2 = (long) reactiveCouchbaseTemplate.findByQuery(Airport.class).distinct(new String[] {}).as(icaoClass)
-					.withConsistency(QueryScanConsistency.REQUEST_PLUS).inCollection(collectionName).count().block();
+			long count2 = (long) reactiveCouchbaseTemplate.findByQuery(Airport.class).inCollection(collectionName)
+					.distinct(new String[] {}).as(icaoClass).withConsistency(REQUEST_PLUS).count().block();
 			assertEquals(2, count2);
 
 		} finally {
@@ -383,7 +379,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	public void existsById() { // 1
 		GetOptions options = GetOptions.getOptions().timeout(Duration.ofSeconds(10));
 		ExistsOptions existsOptions = ExistsOptions.existsOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName).one(vie.withIcao("low7")).block();
+		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName)
+				.one(vie.withIcao("low7")).block();
 		try {
 			Boolean exists = template.existsById().inScope(scopeName).inCollection(collectionName).withOptions(existsOptions)
 					.one(saved.getId()).block();
@@ -397,7 +394,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Disabled // needs analytics data set
 	public void findByAnalytics() { // 2
 		AnalyticsOptions options = AnalyticsOptions.analyticsOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName).one(vie.withIcao("low8")).block();
+		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName)
+				.one(vie.withIcao("low8")).block();
 		try {
 			List<Airport> found = template.findByAnalytics(Airport.class).inScope(scopeName).inCollection(collectionName)
 					.withOptions(options).all().collectList().block();
@@ -410,7 +408,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Test
 	public void findById() { // 3
 		GetOptions options = GetOptions.getOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName).one(vie.withIcao("low9")).block();
+		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName)
+				.one(vie.withIcao("low9")).block();
 		try {
 			Airport found = template.findById(Airport.class).inScope(scopeName).inCollection(collectionName)
 					.withOptions(options).one(saved.getId()).block();
@@ -423,10 +422,11 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Test
 	public void findByQuery() { // 4
 		QueryOptions options = QueryOptions.queryOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName).one(vie.withIcao("lowa")).block();
+		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName)
+				.one(vie.withIcao("lowa")).block();
 		try {
-			List<Airport> found = template.findByQuery(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS)
-					.inScope(scopeName).inCollection(collectionName).withOptions(options).all().collectList().block();
+			List<Airport> found = template.findByQuery(Airport.class).inScope(scopeName).inCollection(collectionName)
+					.withConsistency(REQUEST_PLUS).withOptions(options).all().collectList().block();
 			assertEquals(saved.getId(), found.get(0).getId());
 		} finally {
 			template.removeById().inScope(scopeName).inCollection(collectionName).one(saved.getId()).block();
@@ -436,7 +436,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Test
 	public void findFromReplicasById() { // 5
 		GetAnyReplicaOptions options = GetAnyReplicaOptions.getAnyReplicaOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName).one(vie.withIcao("lowb")).block();
+		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName)
+				.one(vie.withIcao("lowb")).block();
 		try {
 			Airport found = template.findFromReplicasById(Airport.class).inScope(scopeName).inCollection(collectionName)
 					.withOptions(options).any(saved.getId()).block();
@@ -464,7 +465,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Test
 	public void removeById() { // 7
 		RemoveOptions options = RemoveOptions.removeOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName).one(vie.withIcao("lowd")).block();
+		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName)
+				.one(vie.withIcao("lowd")).block();
 		RemoveResult removeResult = template.removeById().inScope(scopeName).inCollection(collectionName)
 				.withOptions(options).one(saved.getId()).block();
 		assertEquals(saved.getId(), removeResult.getId());
@@ -473,11 +475,11 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Test
 	public void removeByQuery() { // 8
 		QueryOptions options = QueryOptions.queryOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName).one(vie.withIcao("lowe")).block();
-		List<RemoveResult> removeResults = template.removeByQuery(Airport.class)
-				.withConsistency(QueryScanConsistency.REQUEST_PLUS).inScope(scopeName).inCollection(collectionName)
-				.withOptions(options).matching(Query.query(QueryCriteria.where("iata").is(vie.getIata()))).all().collectList()
-				.block();
+		Airport saved = template.insertById(Airport.class).inScope(scopeName).inCollection(collectionName)
+				.one(vie.withIcao("lowe")).block();
+		List<RemoveResult> removeResults = template.removeByQuery(Airport.class).inScope(scopeName)
+				.inCollection(collectionName).matching(Query.query(QueryCriteria.where("iata").is(vie.getIata())))
+				.withConsistency(REQUEST_PLUS).withOptions(options).all().collectList().block();
 		assertEquals(saved.getId(), removeResults.get(0).getId());
 	}
 
@@ -519,8 +521,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	public void existsByIdOther() { // 1
 		GetOptions options = GetOptions.getOptions().timeout(Duration.ofSeconds(10));
 		ExistsOptions existsOptions = ExistsOptions.existsOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection).one(vie.withIcao("lowg"))
-				.block();
+		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection)
+				.one(vie.withIcao("lowg")).block();
 		try {
 			Boolean exists = template.existsById().inScope(otherScope).inCollection(otherCollection)
 					.withOptions(existsOptions).one(saved.getId()).block();
@@ -534,8 +536,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Disabled // needs analytics data set
 	public void findByAnalyticsOther() { // 2
 		AnalyticsOptions options = AnalyticsOptions.analyticsOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection).one(vie.withIcao("lowh"))
-				.block();
+		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection)
+				.one(vie.withIcao("lowh")).block();
 		try {
 			List<Airport> found = template.findByAnalytics(Airport.class).inScope(otherScope).inCollection(otherCollection)
 					.withOptions(options).all().collectList().block();
@@ -548,8 +550,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Test
 	public void findByIdOther() { // 3
 		GetOptions options = GetOptions.getOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection).one(vie.withIcao("lowi"))
-				.block();
+		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection)
+				.one(vie.withIcao("lowi")).block();
 		try {
 			Airport found = template.findById(Airport.class).inScope(otherScope).inCollection(otherCollection)
 					.withOptions(options).one(saved.getId()).block();
@@ -562,11 +564,11 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Test
 	public void findByQueryOther() { // 4
 		QueryOptions options = QueryOptions.queryOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection).one(vie.withIcao("lowj"))
-				.block();
+		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection)
+				.one(vie.withIcao("lowj")).block();
 		try {
-			List<Airport> found = template.findByQuery(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS)
-					.inScope(otherScope).inCollection(otherCollection).withOptions(options).all().collectList().block();
+			List<Airport> found = template.findByQuery(Airport.class).inScope(otherScope).inCollection(otherCollection)
+					.withConsistency(REQUEST_PLUS).withOptions(options).all().collectList().block();
 			assertEquals(saved.getId(), found.get(0).getId());
 		} finally {
 			template.removeById().inScope(otherScope).inCollection(otherCollection).one(saved.getId()).block();
@@ -576,8 +578,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Test
 	public void findFromReplicasByIdOther() { // 5
 		GetAnyReplicaOptions options = GetAnyReplicaOptions.getAnyReplicaOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection).one(vie.withIcao("lowk"))
-				.block();
+		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection)
+				.one(vie.withIcao("lowk")).block();
 		try {
 			Airport found = template.findFromReplicasById(Airport.class).inScope(otherScope).inCollection(otherCollection)
 					.withOptions(options).any(saved.getId()).block();
@@ -605,8 +607,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Test
 	public void removeByIdOther() { // 7
 		RemoveOptions options = RemoveOptions.removeOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection).one(vie.withIcao("lowm"))
-				.block();
+		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection)
+				.one(vie.withIcao("lowm")).block();
 		RemoveResult removeResult = template.removeById().inScope(otherScope).inCollection(otherCollection)
 				.withOptions(options).one(saved.getId()).block();
 		assertEquals(saved.getId(), removeResult.getId());
@@ -615,12 +617,11 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Test
 	public void removeByQueryOther() { // 8
 		QueryOptions options = QueryOptions.queryOptions().timeout(Duration.ofSeconds(10));
-		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection).one(vie.withIcao("lown"))
-				.block();
-		List<RemoveResult> removeResults = template.removeByQuery(Airport.class)
-				.withConsistency(QueryScanConsistency.REQUEST_PLUS).inScope(otherScope).inCollection(otherCollection)
-				.withOptions(options).matching(Query.query(QueryCriteria.where("iata").is(vie.getIata()))).all().collectList()
-				.block();
+		Airport saved = template.insertById(Airport.class).inScope(otherScope).inCollection(otherCollection)
+				.one(vie.withIcao("lown")).block();
+		List<RemoveResult> removeResults = template.removeByQuery(Airport.class).inScope(otherScope)
+				.inCollection(otherCollection).matching(Query.query(QueryCriteria.where("iata").is(vie.getIata())))
+				.withConsistency(REQUEST_PLUS).withOptions(options).all().collectList().block();
 		assertEquals(saved.getId(), removeResults.get(0).getId());
 	}
 
@@ -683,9 +684,8 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	@Test
 	public void findByQueryOptions() { // 4
 		QueryOptions options = QueryOptions.queryOptions().timeout(Duration.ofNanos(10));
-		assertThrows(AmbiguousTimeoutException.class,
-				() -> template.findByQuery(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS).inScope(otherScope)
-						.inCollection(otherCollection).withOptions(options).all().collectList().block());
+		assertThrows(AmbiguousTimeoutException.class, () -> template.findByQuery(Airport.class).inScope(otherScope)
+				.inCollection(otherCollection).withConsistency(REQUEST_PLUS).withOptions(options).all().collectList().block());
 	}
 
 	@Test
@@ -723,9 +723,9 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 	public void removeByQueryOptions() { // 8 - options
 		QueryOptions options = QueryOptions.queryOptions().timeout(Duration.ofNanos(10));
 		assertThrows(AmbiguousTimeoutException.class,
-				() -> template.removeByQuery(Airport.class).withConsistency(QueryScanConsistency.REQUEST_PLUS)
-						.inScope(otherScope).inCollection(otherCollection).withOptions(options)
-						.matching(Query.query(QueryCriteria.where("iata").is(vie.getIata()))).all().collectList().block());
+				() -> template.removeByQuery(Airport.class).inScope(otherScope).inCollection(otherCollection)
+						.matching(Query.query(QueryCriteria.where("iata").is(vie.getIata()))).withConsistency(REQUEST_PLUS)
+						.withOptions(options).all().collectList().block());
 	}
 
 	@Test

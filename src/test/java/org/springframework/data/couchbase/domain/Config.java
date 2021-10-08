@@ -18,12 +18,9 @@ package org.springframework.data.couchbase.domain;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.auditing.DateTimeProvider;
-import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.couchbase.CouchbaseClientFactory;
 import org.springframework.data.couchbase.SimpleCouchbaseClientFactory;
 import org.springframework.data.couchbase.config.AbstractCouchbaseConfiguration;
@@ -220,7 +217,7 @@ public class Config extends AbstractCouchbaseConfiguration {
 		return "t"; // this will override '_class', is passed in to new CustomMappingCouchbaseConverter
 	}
 
-	static String scopeName = null;
+	public static String scopeName = null;
 
 	@Override
 	protected String getScopeName() {

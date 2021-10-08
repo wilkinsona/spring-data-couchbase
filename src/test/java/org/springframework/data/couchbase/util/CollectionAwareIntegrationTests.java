@@ -19,8 +19,6 @@ import static org.springframework.data.couchbase.config.BeanNames.COUCHBASE_TEMP
 import static org.springframework.data.couchbase.config.BeanNames.REACTIVE_COUCHBASE_TEMPLATE;
 
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,8 +34,6 @@ import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.ClusterOptions;
 import com.couchbase.client.java.env.ClusterEnvironment;
 import com.couchbase.client.java.manager.collection.CollectionManager;
-import com.couchbase.client.java.manager.collection.CollectionSpec;
-import com.couchbase.client.java.manager.collection.ScopeSpec;
 
 /**
  * Provides Collection support for integration tests
@@ -53,6 +49,7 @@ public class CollectionAwareIntegrationTests extends JavaIntegrationTests {
 
 	@BeforeAll
 	public static void beforeAll() {
+		Config.setScopeName(scopeName);
 		callSuperBeforeAll(new Object() {});
 		ClusterEnvironment environment = environment().build();
 		Cluster cluster = Cluster.connect(seedNodes(),
@@ -69,7 +66,6 @@ public class CollectionAwareIntegrationTests extends JavaIntegrationTests {
 			setupScopeCollection(cluster, otherScope, otherCollection, collectionManager);
 		}
 
-		Config.setScopeName(scopeName);
 		ApplicationContext ac = new AnnotationConfigApplicationContext(Config.class);
 		// the Config class has been modified, these need to be loaded again
 		couchbaseTemplate = (CouchbaseTemplate) ac.getBean(COUCHBASE_TEMPLATE);

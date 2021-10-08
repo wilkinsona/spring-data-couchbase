@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import com.couchbase.client.core.io.CollectionIdentifier;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.context.ApplicationContext;
@@ -60,6 +59,7 @@ import com.couchbase.client.core.error.ParsingFailureException;
 import com.couchbase.client.core.error.QueryException;
 import com.couchbase.client.core.error.ScopeNotFoundException;
 import com.couchbase.client.core.error.UnambiguousTimeoutException;
+import com.couchbase.client.core.io.CollectionIdentifier;
 import com.couchbase.client.core.json.Mapper;
 import com.couchbase.client.core.service.ServiceType;
 import com.couchbase.client.java.Bucket;
@@ -105,9 +105,12 @@ public class JavaIntegrationTests extends ClusterAwareIntegrationTests {
 		} catch (IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
-		ApplicationContext ac = new AnnotationConfigApplicationContext(Config.class);
-		couchbaseTemplate = (CouchbaseTemplate) ac.getBean(COUCHBASE_TEMPLATE);
-		reactiveCouchbaseTemplate = (ReactiveCouchbaseTemplate) ac.getBean(REACTIVE_COUCHBASE_TEMPLATE);
+		// This will result in a Transactions object being created.
+		if (couchbaseTemplate == null || reactiveCouchbaseTemplate == null) {
+			ApplicationContext ac = new AnnotationConfigApplicationContext(Config.class);
+			couchbaseTemplate = (CouchbaseTemplate) ac.getBean(COUCHBASE_TEMPLATE);
+			reactiveCouchbaseTemplate = (ReactiveCouchbaseTemplate) ac.getBean(REACTIVE_COUCHBASE_TEMPLATE);
+		}
 	}
 
 	/**

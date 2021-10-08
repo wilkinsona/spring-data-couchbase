@@ -19,20 +19,20 @@ import reactor.core.publisher.Mono;
 
 import org.springframework.data.couchbase.core.mapping.CouchbaseDocument;
 import org.springframework.data.couchbase.core.mapping.event.CouchbaseMappingEvent;
+import org.springframework.data.couchbase.repository.support.TransactionResultHolder;
 
 public interface ReactiveTemplateSupport {
 
 	Mono<CouchbaseDocument> encodeEntity(Object entityToEncode);
 
-	<T> Mono<T> decodeEntity(String id, String source, long cas, Class<T> entityClass);
+	<T> Mono<T> decodeEntity(String id, String source, long cas, Class<T> entityClass, TransactionResultHolder txHolder);
 
-	<T> Mono<T> applyUpdatedCas(T entity, CouchbaseDocument converted, long cas);
-
-	<T> Mono<T> applyUpdatedId(T entity, Object id);
+	<T> Mono<T> applyResult(T entity, CouchbaseDocument converted, Object id, long cas,
+			TransactionResultHolder txResultHolder);
 
 	Long getCas(Object entity);
 
 	String getJavaNameForEntity(Class<?> clazz);
 
-	void maybeEmitEvent(CouchbaseMappingEvent<?> event);
+	<T> TransactionResultHolder getTxResultHolder(T source);
 }

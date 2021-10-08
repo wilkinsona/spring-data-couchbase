@@ -17,7 +17,10 @@
 package org.springframework.data.couchbase.config;
 
 import static com.couchbase.client.java.ClusterOptions.clusterOptions;
+import static org.springframework.data.couchbase.config.BeanNames.COUCHBASE_MAPPING_CONTEXT;
+import static org.springframework.data.couchbase.config.BeanNames.COUCHBASE_TRANSACTIONS;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,6 +49,7 @@ import org.springframework.data.mapping.model.PropertyNameFieldNamingStrategy;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
+import com.couchbase.client.core.cnc.Event;
 import com.couchbase.client.core.deps.com.fasterxml.jackson.databind.DeserializationFeature;
 import com.couchbase.client.core.encryption.CryptoManager;
 import com.couchbase.client.core.env.Authenticator;
@@ -57,6 +61,10 @@ import com.couchbase.client.java.encryption.databind.jackson.EncryptionModule;
 import com.couchbase.client.java.env.ClusterEnvironment;
 import com.couchbase.client.java.json.JacksonTransformers;
 import com.couchbase.client.java.json.JsonValueModule;
+import com.couchbase.transactions.TransactionDurabilityLevel;
+import com.couchbase.transactions.Transactions;
+import com.couchbase.transactions.config.TransactionConfig;
+import com.couchbase.transactions.config.TransactionConfigBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -122,7 +130,7 @@ public abstract class AbstractCouchbaseConfiguration {
 	 * @param couchbaseCluster the cluster reference from the SDK.
 	 * @return the initialized factory.
 	 */
-	@Bean
+	@Bean(name = BeanNames.COUCHBASE_CLIENT_FACTORY)
 	public CouchbaseClientFactory couchbaseClientFactory(final Cluster couchbaseCluster) {
 		return new SimpleCouchbaseClientFactory(couchbaseCluster, getBucketName(), getScopeName());
 	}
@@ -283,7 +291,7 @@ public abstract class AbstractCouchbaseConfiguration {
 	 *
 	 * @throws Exception on Bean construction failure.
 	 */
-	@Bean
+	@Bean(COUCHBASE_MAPPING_CONTEXT)
 	public CouchbaseMappingContext couchbaseMappingContext(CustomConversions customConversions) throws Exception {
 		CouchbaseMappingContext mappingContext = new CouchbaseMappingContext();
 		mappingContext.setInitialEntitySet(getInitialEntitySet());
@@ -310,6 +318,16 @@ public abstract class AbstractCouchbaseConfiguration {
 			mapper.registerModule(new EncryptionModule(cryptoManager));
 		}
 		return mapper;
+	}
+
+	@Bean(COUCHBASE_TRANSACTIONS)
+	public Transactions getTransactions(Cluster cluster) {
+		return Transactions.create(cluster, getTransactionConfig());
+	}
+
+	TransactionConfig getTransactionConfig() {
+		return TransactionConfigBuilder.create().logDirectly(Event.Severity.INFO).logOnFailure(true, Event.Severity.ERROR)
+				.expirationTime(Duration.ofMinutes(10)).durabilityLevel(TransactionDurabilityLevel.NONE).build();
 	}
 
 	/**

@@ -17,20 +17,21 @@ package org.springframework.data.couchbase.core;
 
 import org.springframework.data.couchbase.core.mapping.CouchbaseDocument;
 import org.springframework.data.couchbase.core.mapping.event.CouchbaseMappingEvent;
+import org.springframework.data.couchbase.repository.support.TransactionResultHolder;
 
 public interface TemplateSupport {
 
 	CouchbaseDocument encodeEntity(Object entityToEncode);
 
-	<T> T decodeEntity(String id, String source, long cas, Class<T> entityClass);
+	<T> T decodeEntity(String id, String source, long cas, Class<T> entityClass, TransactionResultHolder txResultHolder);
 
-	<T> T applyUpdatedCas(T entity, CouchbaseDocument converted, long cas);
+	<T> T applyResult(T entity, CouchbaseDocument converted, Object id, long cas, TransactionResultHolder txResultHolder);
 
-	<T> T applyUpdatedId(T entity, Object id);
-
-	long getCas(Object entity);
+	Long getCas(Object entity);
 
 	String getJavaNameForEntity(Class<?> clazz);
 
 	void maybeEmitEvent(CouchbaseMappingEvent<?> event);
+
+	<T> TransactionResultHolder getTxResultHolder(T source);
 }

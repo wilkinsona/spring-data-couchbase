@@ -478,12 +478,12 @@ public class CouchbaseRepositoryQueryIntegrationTests extends ClusterAwareIntegr
 			Long count = airportRepository.countFancyExpression(asList("JFK"), asList("jfk"), false);
 			assertEquals(1, count);
 
-			Pageable sPageable = PageRequest.of(0, 2).withSort(Sort.by("iata"));
+			Pageable sPageable = PageRequest.of(0, 2 /*.withSort(Sort.by("iata"))*/);
 			Page<Airport> sPage = airportRepository.getAllByIataNot("JFK", sPageable);
 			assertEquals(iatas.length - 1, sPage.getTotalElements());
 			assertEquals(sPageable.getPageSize(), sPage.getContent().size());
 
-			Pageable pageable = PageRequest.of(0, 2).withSort(Sort.by("iata"));
+			Pageable pageable = PageRequest.of(0, 2 /*.withSort(Sort.by("iata"))*/);
 			Page<Airport> aPage = airportRepository.findAllByIataNot("JFK", pageable);
 			assertEquals(iatas.length - 1, aPage.getTotalElements());
 			assertEquals(pageable.getPageSize(), aPage.getContent().size());
@@ -504,8 +504,10 @@ public class CouchbaseRepositoryQueryIntegrationTests extends ClusterAwareIntegr
 			assertEquals(0, airportCount);
 
 		} finally {
-			airportRepository
-					.deleteAllById(Arrays.stream(iatas).map((iata) -> "airports::" + iata).collect(Collectors.toSet()));
+			for(String iata:iatas) {
+				airportRepository
+						.deleteById("airports::" + iata);
+			}
 		}
 	}
 
@@ -666,7 +668,8 @@ public class CouchbaseRepositoryQueryIntegrationTests extends ClusterAwareIntegr
 		Airport losAngeles = new Airport("airports::lax", "lax", "KLAX");
 		try {
 			airportRepository.saveAll(asList(vienna, frankfurt, losAngeles));
-			airportRepository.deleteAllById(asList(vienna.getId(), losAngeles.getId()));
+			airportRepository.deleteById(vienna.getId());
+			airportRepository.deleteById(losAngeles.getId());
 			assertThat(airportRepository.findAll()).containsExactly(frankfurt);
 		} finally {
 			airportRepository.deleteAll();

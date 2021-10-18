@@ -121,7 +121,6 @@ public class SimpleCouchbaseRepository<T, ID> extends CouchbaseRepositoryBase<T,
 		operations.removeById(getJavaType()).inScope(getScope()).inCollection(getCollection()).one(getId(entity));
 	}
 
-	@Override
 	public void deleteAllById(Iterable<? extends ID> ids) {
 		Assert.notNull(ids, "The given Iterable of ids must not be null!");
 		operations.removeById(getJavaType()).inScope(getScope()).inCollection(getCollection())

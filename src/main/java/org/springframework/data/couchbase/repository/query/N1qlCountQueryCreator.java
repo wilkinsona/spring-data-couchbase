@@ -118,9 +118,8 @@ public class N1qlCountQueryCreator extends OldN1qlQueryCreator {
 			return delegate.first();
 		}
 
-		@Override
 		public Pageable withPage(int i) {
-			return new CountPageable(delegate.withPage(i));
+			return new CountPageable(delegate);
 		}
 
 		public boolean hasPrevious() {

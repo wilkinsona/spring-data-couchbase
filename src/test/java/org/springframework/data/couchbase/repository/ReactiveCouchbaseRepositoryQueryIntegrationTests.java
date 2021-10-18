@@ -221,8 +221,8 @@ public class ReactiveCouchbaseRepositoryQueryIntegrationTests extends JavaIntegr
 			airportRepository.saveAll(asList(vienna, frankfurt, losAngeles)).as(StepVerifier::create)
 					.expectNext(vienna, frankfurt, losAngeles).verifyComplete();
 
-			airportRepository.deleteAllById(asList(vienna.getId(), losAngeles.getId())).as(StepVerifier::create)
-					.verifyComplete();
+			airportRepository.deleteById(vienna.getId()).block();
+			airportRepository.deleteById(losAngeles.getId()).block();
 
 			airportRepository.findAll().as(StepVerifier::create).expectNext(frankfurt).verifyComplete();
 		} finally {

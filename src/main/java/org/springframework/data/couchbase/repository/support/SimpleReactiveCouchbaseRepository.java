@@ -162,7 +162,7 @@ public class SimpleReactiveCouchbaseRepository<T, ID> extends CouchbaseRepositor
 				.then();
 	}
 
-	@Override
+
 	public Mono<Void> deleteAllById(Iterable<? extends ID> ids) {
 		return operations.removeById(getJavaType()).inScope(getScope()).inCollection(getCollection())
 				.all(Streamable.of(ids).map(Object::toString).toList()).then();

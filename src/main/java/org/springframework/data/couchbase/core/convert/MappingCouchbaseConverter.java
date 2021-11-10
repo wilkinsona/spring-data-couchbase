@@ -36,7 +36,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.convert.CustomConversions;
-import org.springframework.data.convert.EntityInstantiator;
+import org.springframework.data.mapping.model.EntityInstantiator;
 import org.springframework.data.couchbase.core.mapping.CouchbaseDocument;
 import org.springframework.data.couchbase.core.mapping.CouchbaseList;
 import org.springframework.data.couchbase.core.mapping.CouchbaseMappingContext;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2020 the original author or authors
+ * Copyright 2012-2021 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.springframework.data.couchbase.core.mapping.event;
 
 import java.util.Set;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ import org.springframework.data.couchbase.core.mapping.CouchbaseDocument;
 import org.springframework.util.Assert;
 
 /**
- * javax.validation dependant entities validator. When it is registered as Spring component its automatically invoked
+ * jakarta.validation dependant entities validator. When it is registered as Spring component its automatically invoked
  * before entities are saved in database.
  *
  * @author Maciej Walkowiak

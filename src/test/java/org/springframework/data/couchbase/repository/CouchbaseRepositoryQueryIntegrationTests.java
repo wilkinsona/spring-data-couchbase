@@ -45,7 +45,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

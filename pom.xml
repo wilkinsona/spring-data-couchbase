@@ -5,7 +5,7 @@
 
     <groupId>org.springframework.data</groupId>
     <artifactId>spring-data-couchbase</artifactId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>5.0.0-SNAPSHOT</version>
 
     <name>Spring Data Couchbase</name>
     <description>Spring Data integration for Couchbase</description>
@@ -14,13 +14,13 @@
     <parent>
         <groupId>org.springframework.data.build</groupId>
         <artifactId>spring-data-parent</artifactId>
-        <version>2.6.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
 
     <properties>
         <couchbase>3.2.3</couchbase>
         <couchbase.osgi>3.2.3</couchbase.osgi>
-        <springdata.commons>2.6.0-SNAPSHOT</springdata.commons>
+        <springdata.commons>3.0.0-SNAPSHOT</springdata.commons>
         <java-module-name>spring.data.couchbase</java-module-name>
     </properties>
 
@@ -72,9 +72,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>5.3.6.Final</version>
+            <version>7.0.1.Final</version>
             <scope>test</scope>
         </dependency>
 
@@ -98,13 +98,6 @@
         </dependency>
 
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>${jodatime}</version>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
             <scope>test</scope>
@@ -112,54 +105,46 @@
 
         <!-- JSR 303 Validation -->
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
             <version>${validation}</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>javax.el-api</artifactId>
-            <version>3.0.0</version>
+            <groupId>jakarta.el</groupId>
+            <artifactId>jakarta.el-api</artifactId>
+            <version>3.0.2</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
-            <version>3.0.0</version>
+            <artifactId>jakarta.el</artifactId>
+            <version>3.0.2</version>
             <scope>test</scope>
         </dependency>
 
         <!-- CDI -->
-        <!-- Dependency order required to build against CDI 1.0 and test with CDI 2.0 -->
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jcdi_2.0_spec</artifactId>
-            <version>1.0.1</version>
+            <groupId>jakarta.interceptor</groupId>
+            <artifactId>jakarta.interceptor-api</artifactId>
+            <version>2.0.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>javax.interceptor</groupId>
-            <artifactId>javax.interceptor-api</artifactId>
-            <version>1.2.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
             <version>${cdi}</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
 
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>${javax-annotation-api}</version>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>${jakarta-annotation-api}</version>
             <scope>test</scope>
         </dependency>
 
@@ -217,8 +202,8 @@
 
     <repositories>
         <repository>
-            <id>spring-libs-snapshot</id>
-            <url>https://repo.spring.io/libs-snapshot</url>
+            <id>spring-snapshot</id>
+            <url>https://repo.spring.io/snapshot</url>
         </repository>
         <repository>
             <id>sonatype-snapshot</id>

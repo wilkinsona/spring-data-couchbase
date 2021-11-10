@@ -9,10 +9,9 @@ Export-Template:
 Import-Template:
  com.couchbase.client.*;version="${couchbase.osgi:[=.=.=,+1.0.0)}",
  com.fasterxml.jackson.*;version="${jackson:[=.=.=,+1.0.0)}",
- javax.enterprise.*;version="${cdi:[=.=.=,+1.0.0)}";resolution:=optional,
- javax.validation.*;version="${validation:[=.=.=.=,+1.0.0)}";resolution:=optional,
+ jakarta.enterprise.*;version="${cdi:[=.=.=,+1.0.0)}";resolution:=optional,
+ jakarta.validation.*;version="${validation:[=.=.=.=,+1.0.0)}";resolution:=optional,
  org.aopalliance.*;version="[1.0.0, 2.0.0)";resolution:=optional,
- org.joda.time.*;version="${jodatime:[=.=.=,+1.0.0)}";resolution:=optional,
  org.slf4j.*;version="${slf4j:[=.=.=,+1.0.0)}",
  org.springframework.*;version="${spring:[=.=.=.=,+1.0.0)}",
  org.springframework.data.*;version="${springdata.commons:[=.=.=.=,+1.0.0)}",

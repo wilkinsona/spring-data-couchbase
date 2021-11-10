@@ -24,7 +24,7 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.Expiration;
 
-import javax.validation.constraints.Max;
+import jakarta.validation.constraints.Max;
 
 /**
  * Airport entity

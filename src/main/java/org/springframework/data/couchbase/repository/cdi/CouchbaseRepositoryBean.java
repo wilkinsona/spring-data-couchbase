@@ -19,9 +19,9 @@ import java.lang.annotation.Annotation;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
 
 import org.springframework.data.couchbase.core.CouchbaseOperations;
 import org.springframework.data.couchbase.repository.config.RepositoryOperationsMapping;
@@ -60,7 +60,7 @@ public class CouchbaseRepositoryBean<T> extends CdiRepositoryBean<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.cdi.CdiRepositoryBean#create(javax.enterprise.context.spi.CreationalContext, java.lang.Class)
+	 * @see org.springframework.data.repository.cdi.CdiRepositoryBean#create(jakarta.enterprise.context.spi.CreationalContext, java.lang.Class)
 	*/
 	@Override
 	protected T create(CreationalContext<T> creationalContext, Class<T> repositoryType) {
